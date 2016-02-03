@@ -1,5 +1,7 @@
 var express = require('express');
 var app = express();
+var http = require('http');
+var querystring = require("querystring");
 var Redis = require("ioredis"),
     client = new Redis();
 
@@ -8,24 +10,53 @@ var Redis = require("ioredis"),
 function Board(re) { 
     this.re = re;
 };
-Board.prototype.post = function (txt, http_res) {
+Board.prototype.post = function (username, txt, http_res) {
     var self = this;
-    this.re.incr("next_post_id").then(function (pid){
-        self.re.zadd("posts",pid,"#" + pid + " " + txt);
-        http_res.send('OK');
-    });
+    var options = {
+        host: "127.0.0.1",
+        port: "3040",
+        path: "/include?" + querystring.stringify({u:username})
+    };
+    http.request(options, function (response) {
+        var str = '';
+        response.on('data', function (chunk) { str += chunk; });
+        response.on('end', function () {
+            var resp = JSON.parse(str); 
+            if (resp && resp.code == "OK") {
+                self.re.incr("next_post_id").then(function (pid){
+                    self.re.zadd("posts",pid,"#" + pid + " " + txt);
+                    reply= {
+                        code: "OK",
+                        msg: ""
+                    };
+                    http_res.send(JSON.stringify(reply));
+                });
+            } else {
+                reply= {
+                    code: "KO",
+                    msg: "User not part of this board !"
+                };
+                http_res.send(JSON.stringify(reply));
+            }
+        });
+    }).end();
 };
 Board.prototype.get = function (last_idx, http_res) {
     this.re.zrange("posts", last_idx, -1).then(function (replies){
-//        replies.forEach(function (reply, i){
-//            console.log("POST: " + reply);
-//        });
-        http_res.send("OK " + JSON.stringify(replies));
+        reply= {
+            code: "OK",
+            msg: replies
+        };
+        http_res.send(JSON.stringify(reply));
     });
 };
 Board.prototype.erase = function (http_res) {
     this.re.del("posts");
-    http_res.send('OK');
+    reply= {
+        code: "OK",
+        msg: ""
+    };
+    http_res.send(JSON.stringify(reply));
 };
 
 var board = new Board(client);
@@ -36,11 +67,11 @@ app.get('/', function (req, res) {
 });
 
 app.get('/post', function (req, res) {
-    board.post(req.query.p, res);
+    board.post(req.query.u, req.query.p, res);
 });
 
 app.get('/get', function (req, res) {
-    board.get(req.query.i,res);
+    board.get(req.query.i, res);
 });
 
 app.get('/erase', function (req, res) {
@@ -48,7 +79,6 @@ app.get('/erase', function (req, res) {
 });
 
 var server = app.listen(3030, function () {
-
   var host = server.address().address;
   var port = server.address().port;
 

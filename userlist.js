@@ -9,30 +9,61 @@ function UserList(re) {
     this.re = re;
 };
 UserList.prototype.add = function (username, http_res) {
-    // Verify user unicity
     var self = this;
+    // Verify user unicity
     this.re.hexists("userlist", username).then(function (result) {
-        if (result) {
-            http_res.send("KO: User " + username + " already exists");
+        if (result == "0") {
+            reply= {
+                code: "KO",
+                msg: "User " + username + "already exists."
+            };
+            http_res.send(JSON.stringify(reply));
         } else {
             self.re.incr("next_ser_id").then(function (uid) {
                 self.re.hset("userlist", username, uid);
-                http_res.send("OK");
+                reply= {
+                    code: "OK",
+                    msg: ""
+                };
+                http_res.send(JSON.stringify(reply));
             });
         }
     });
 };
 UserList.prototype.get = function (http_res) {
     this.re.hkeys("userlist").then(function (replies) {
-        http_res.send("OK " + JSON.stringify(replies));
-        //replies.forEach(function (reply, i){
-        //    console.log("USER: " + reply);
-        //});
+        reply= {
+            code: "OK",
+            msg: replies
+        };
+        http_res.send(JSON.stringify(reply));
     });
+};
+UserList.prototype.include = function (username, http_res) {
+    self = this;
+    this.re.hexists("userlist", username).then(function (result) {
+    console.log(result);
+    var reply = {};
+    if (result != "0") {
+        reply= {
+            code: "KO",
+            msg: "User " + username + " not included in userlist"
+        };
+    } else {
+        reply= {
+            code: "OK",
+            msg: "User " + username + " included in userlist"
+        };
+    }});
+    http_res.send(JSON.stringify(reply));
 };
 UserList.prototype.erase = function (http_res) {
     this.re.del("userlist");
-    http_res.send("OK");
+    reply= {
+        code: "OK",
+        msg: ""
+    };
+    http_res.send(JSON.stringify(reply));
 };
 
 
@@ -49,6 +80,10 @@ app.get('/add', function (req, res) {
 
 app.get('/get', function (req, res) {
     ul.get(res);
+});
+
+app.get('/include', function (req, res) {
+    ul.include(req.query.u, res);
 });
 
 app.get('/erase', function (req, res) {

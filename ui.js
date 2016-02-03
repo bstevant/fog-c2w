@@ -1,18 +1,34 @@
 var querystring = require("querystring");
 var http = require('http');
 var str_command = "NOOP";
+var last_recvd = "";
+var last_status = "";
 
 callback = function(response) {
   var str = '';
 
-  //another chunk of data has been recieved, so append it to `str`
+  //another chunk of data has been received, so append it to `str`
   response.on('data', function (chunk) {
     str += chunk;
   });
 
-  //the whole response has been recieved, so we just print it out here
+  //the whole response has been received, so we just print it out here
   response.on('end', function () {
-    console.log(str_command + " : " + str);
+      var resp = JSON.parse(str);
+      if (resp) {
+          last_status = resp.code;
+          last_recvd = resp.msg;
+      } else {
+          last_status = "KO";
+          last_recvd = "Bad response from server";
+      }
+      if (resp.msg instanceof Array) {
+          resp.msg.forEach(function(l, i) {
+              console.log(str_command + " " + last_status + " : " + l);
+          });
+      } else {
+          console.log(str_command + " " + last_status + " : " + last_recvd);
+      }
   });
 }
 
@@ -22,12 +38,12 @@ function BoardUI(host, port) {
     this.host = host;
     this.port = port;
 };
-BoardUI.prototype.post = function (txt) {
+BoardUI.prototype.post = function (username, txt) {
     var self = this;
     var options = {
         host: this.host,
         port: this.port,
-        path: "/post?" + querystring.stringify({p:txt})
+        path: "/post?" + querystring.stringify({u:username, p:txt})
     };
     str_command = "POST"
     http.request(options,callback).end();
@@ -93,7 +109,7 @@ function UI(username, b, ul) {
     this.userlist.add(username);
 };
 UI.prototype.post = function (txt) {
-    this.board.post(this.username + " " + txt);
+    this.board.post(this.username, txt);
 };
 UI.prototype.print_board = function () {
     this.board.get(0);
