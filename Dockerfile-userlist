@@ -1,0 +1,10 @@
+FROM node:slim
+
+WORKDIR /c2w
+RUN apt-get update && apt-get install -y redis-server
+RUN npm install ioredis express
+
+COPY userlist.js .
+COPY start_userlist.sh .
+
+CMD sh start_userlist.sh

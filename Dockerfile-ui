@@ -1,0 +1,6 @@
+FROM node:slim
+
+WORKDIR /c2w
+COPY ui.js .
+
+CMD node ui.js

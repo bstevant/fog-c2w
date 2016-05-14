@@ -15,7 +15,7 @@ UserList.prototype.add = function (username, http_res) {
         if (result == "0") {
             reply= {
                 code: "KO",
-                msg: "User " + username + "already exists."
+                msg: "User " + username + " already exists."
             };
             http_res.send(JSON.stringify(reply));
         } else {

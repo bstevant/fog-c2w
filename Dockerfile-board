@@ -1,0 +1,10 @@
+FROM node:slim
+
+WORKDIR /c2w
+RUN apt-get update && apt-get install -y redis-server
+RUN npm install ioredis express
+
+COPY board.js .
+COPY start_board.sh .
+
+CMD sh start_board.sh
