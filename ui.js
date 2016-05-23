@@ -124,8 +124,8 @@ UI.prototype.erase = function () {
 };
 
 
-var board = new BoardUI("192.168.64.2", "3030");
-var userlist = new UserListUI("192.168.64.2", "3040");
+var board = new BoardUI("127.0.0.1", "3030");
+var userlist = new UserListUI("127.0.0.1", "3040");
 
 var readline = require('readline');
 var rl = readline.createInterface(process.stdin, process.stdout);

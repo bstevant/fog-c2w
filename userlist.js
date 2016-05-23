@@ -12,7 +12,7 @@ UserList.prototype.add = function (username, http_res) {
     var self = this;
     // Verify user unicity
     this.re.hexists("userlist", username).then(function (result) {
-        if (result == "0") {
+        if (result != "0") {
             reply= {
                 code: "KO",
                 msg: "User " + username + " already exists."
@@ -42,7 +42,7 @@ UserList.prototype.get = function (http_res) {
 UserList.prototype.include = function (username, http_res) {
     self = this;
     this.re.hexists("userlist", username).then(function (result) {
-    console.log(result);
+    //console.log(result);
     var reply = {};
     if (result != "0") {
         reply= {
