@@ -1,4 +1,5 @@
 #!/bin/sh
 
-nohup /etc/init.d/redis-server start
-node userlist.js
+/etc/init.d/redis-server start
+tmux neww nodejs userlist.js
+tmux attach

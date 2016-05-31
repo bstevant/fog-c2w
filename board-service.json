@@ -1,0 +1,5 @@
+{"service": {
+    "name": "c2w-board", 
+    "tags": ["nodejs"], 
+    "port": 3030
+}}

@@ -1,4 +1,5 @@
 #!/bin/sh
 
-nohup /etc/init.d/redis-server start
-node board.js
+/etc/init.d/redis-server start
+tmux neww nodejs board.js
+tmux attach

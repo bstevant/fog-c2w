@@ -1,10 +1,20 @@
-FROM node:slim
+FROM ubuntu:xenial-consul-deb
 
 WORKDIR /c2w
-RUN apt-get update && apt-get install -y redis-server
+
+RUN apt-get update && apt-get install -y redis-server npm tmux dnsutils dnsmasq
 RUN npm install ioredis express
 
+COPY consul_0.6.4-1~xenial1~ppa1_amd64.deb .
+RUN dpkg -i consul_0.6.4-1~xenial1~ppa1_amd64.deb
+RUN rm -f /etc/consul.d/20-agent.json
+RUN echo "server=/consul/127.0.0.1#8600" > /etc/dnsmasq.d/10-consul
+RUN echo "user=root" > /etc/dnsmasq.d/00-root
+RUN echo "nameserver 127.0.0.1" > /etc/resolv.conf 
+
 COPY board.js .
+COPY board-service.json /etc/consul.d/
+COPY start_consul_server.sh .
 COPY start_board.sh .
 
-CMD sh start_board.sh
+CMD sh start_consul_server.sh $IP $BOOTSTRAP && sh start_board.sh
