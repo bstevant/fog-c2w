@@ -13,7 +13,7 @@ function Board(re) {
 Board.prototype.post = function (username, txt, http_res) {
     var self = this;
     var options = {
-        host: "127.0.0.1",
+        host: "c2w-userlist.service.consul",
         port: "3040",
         path: "/include?" + querystring.stringify({u:username})
     };

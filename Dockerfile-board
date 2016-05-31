@@ -10,7 +10,6 @@ RUN dpkg -i consul_0.6.4-1~xenial1~ppa1_amd64.deb
 RUN rm -f /etc/consul.d/20-agent.json
 RUN echo "server=/consul/127.0.0.1#8600" > /etc/dnsmasq.d/10-consul
 RUN echo "user=root" > /etc/dnsmasq.d/00-root
-RUN echo "nameserver 127.0.0.1" > /etc/resolv.conf 
 
 COPY board.js .
 COPY board-service.json /etc/consul.d/

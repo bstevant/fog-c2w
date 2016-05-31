@@ -7,10 +7,9 @@ COPY consul_0.6.4-1~xenial1~ppa1_amd64.deb .
 RUN dpkg -i consul_0.6.4-1~xenial1~ppa1_amd64.deb
 RUN echo "server=/consul/127.0.0.1#8600" > /etc/dnsmasq.d/10-consul
 RUN echo "user=root" > /etc/dnsmasq.d/00-root
-RUN echo "nameserver 127.0.0.1" > /etc/resolv.conf 
 
 COPY ui.js .
 COPY start_consul_agent.sh .
 COPY start_ui.sh .
 
-CMD sh start_consul_agent.sh && sh start_ui.sh
+CMD sh start_consul_agent.sh $IP && sh start_ui.sh
