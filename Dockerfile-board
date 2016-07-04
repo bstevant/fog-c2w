@@ -1,4 +1,4 @@
-FROM ubuntu:xenial-consul-deb
+FROM ubuntu:xenial
 
 WORKDIR /c2w
 
@@ -15,5 +15,7 @@ COPY board.js .
 COPY board-service.json /etc/consul.d/
 COPY start_consul_server.sh .
 COPY start_board.sh .
+
+EXPOSE 8301 3030
 
 CMD sh start_consul_server.sh $IP $BOOTSTRAP && sh start_board.sh

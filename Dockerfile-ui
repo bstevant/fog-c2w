@@ -1,4 +1,4 @@
-FROM ubuntu:xenial-consul-deb
+FROM ubuntu:xenial
 
 WORKDIR /c2w
 
@@ -11,5 +11,7 @@ RUN echo "user=root" > /etc/dnsmasq.d/00-root
 COPY ui.js .
 COPY start_consul_agent.sh .
 COPY start_ui.sh .
+
+EXPOSE 8301
 
 CMD sh start_consul_agent.sh $IP && sh start_ui.sh
